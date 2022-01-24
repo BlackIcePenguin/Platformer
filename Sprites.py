@@ -6,7 +6,7 @@ pygame.init()
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, image_path):
+    def __init__(self, image_path, collide_list):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load(image_path)
         self.rect = self.image.get_rect()
@@ -18,36 +18,48 @@ class Player(pygame.sprite.Sprite):
         self.frame_rate = 180
         self.walk = False
         self.run = False
-        self.idle = True
+        self.right = True
+        self.left = False
+        self.airborne = False
+        self.moving = True
+        self.collide_list = []
+        self.collide_list.append(self.rect)
+        for item in collide_list:
+            rect = item.getrect()
+            self.collide_list.append(rect)
+        print(collide_list)
 
     def update(self):
         current_time = pygame.time.get_ticks()
         self.rect.x += self.change_x
         self.rect.y += self.change_y
 
+        pygame.draw.rect(self.image, WHITE, [0, 0, self.rect.width, self.rect.height])
+
         keys = pygame.key.get_pressed()
-        self.idle = True
-        self.walk = False
-        self.run = False
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return 3
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_q:
                     break
-                if event.key == pygame.K_RIGHT:
-                    self.run = False
-                    self.walk = True
-                    self.idle = False
-        if keys[pygame.K_LSHIFT and (pygame.K_RIGHT or pygame.K_LEFT)]:
+
+        if keys[pygame.K_LSHIFT]:
+            print(3)
             self.run = True
-            self.walk = False
-            self.idle = False
 
         if keys[pygame.K_RIGHT]:
-            self.change_x = 4
+            self.change_x = 2
+            self.right = True
+            self.left = False
+            self.moving = True
+            self.walk = True
         elif keys[pygame.K_LEFT]:
-            self.change_x = -4
+            self.change_x = -2
+            self.right = False
+            self.left = True
+            self.moving = True
+            self.walk = True
         elif keys[pygame.K_UP]:
             self.change_y = -4
         elif keys[pygame.K_DOWN]:
@@ -55,27 +67,53 @@ class Player(pygame.sprite.Sprite):
         else:
             self.change_x = 0
             self.change_y = 0
+
+        for event in pygame.event.get():
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_LSHIFT:
+                    self.run = False
+                if event.key == pygame.K_RIGHT or pygame.K_LEFT:
+                    self.walk = False
+
         if self.rect.left + self.change_x <= 0 or self.rect.right + self.change_x >= SCREEN_WIDTH:
             self.change_x = 0
         if self.rect.top + self.change_y <= 0 or self.rect.bottom + self.change_y >= SCREEN_HEIGHT:
             self.change_y = 0
 
+        # if pygame.Rect.collidelistall(self.collide_list):
+        #    pass
+
         if current_time - self.prev_update > self.frame_rate:
             self.prev_update = current_time
             self.frame += 1
         if self.run:
-            pass
+            self.change_x *= 2
+            if self.right:
+                if self.frame > len(Run_Right_List) - 1:
+                    self.frame = 0
+                self.image = Run_Right_List[self.frame]
+            elif self.left:
+                if self.frame > len(Run_Left_List) - 1:
+                    self.frame = 0
+                self.image = Run_Left_List[self.frame]
         elif self.walk:
-            if keys[pygame.K_RIGHT]:
-                if self.frame > len(Walk_Right_List):
+            if self.right:
+                if self.frame > len(Walk_Right_List) - 1:
                     self.frame = 0
                 self.image = Walk_Right_List[self.frame]
-                self.rect = self.image.get_rect()
-        elif self.idle:
+            elif self.left:
+                if self.frame > len(Walk_Left_List) - 1:
+                    self.frame = 0
+                self.image = Walk_Left_List[self.frame]
+        elif self.airborne:
+            pass
+        else:
             if self.frame > len(Idle_List) - 1:
                 self.frame = 0
             self.image = Idle_List[self.frame]
-            self.rect = self.image.get_rect()
+
+        self.walk = False
+        self.run = False
 
         return 0
 

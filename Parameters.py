@@ -43,7 +43,11 @@ Idle_List = []
 for i in range(1, 5):
     image = pygame.image.load(f"warped city files/SPRITES/player/idle/idle-{i}.png")
     Idle_List.append(image)
-print(Idle_List)
+Run_Right_List = []
+for i in range(1, 9):
+    image = pygame.image.load(f"warped city files/SPRITES/player/run/run-{i}.png")
+    Run_Right_List.append(image)
+Run_Left_List = [pygame.transform.flip(player, True, False) for player in Run_Right_List]
 
 # Layout, current is for testing the character
 LAYOUT = ["BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
