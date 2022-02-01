@@ -29,7 +29,7 @@ block = pygame.transform.scale2x(block)
 pillar = tile_map.image_at((192, 16, 16, 48))
 pillar = pygame.transform.scale2x(pillar)
 
-player = Player(temp_char, tile_group)
+player = Player(temp_char)
 player_group.add(player)
 # all_sprites.add(player)
 
@@ -71,13 +71,30 @@ while running:
             if event.key == pygame.K_q:
                 running = False
 
+    floor = False
+    r_wall = False
+    l_wall = False
+    roof = False
+
     for item in tile_group:
         if pygame.sprite.collide_rect(player, item):
-            print(1)
+            if item.rect.top <= player.rect.bottom + player.change_y:
+                player.rect.y -= player.change_y
+                player.falling = False
+                player.change_y = 0
 
+            elif item.rect.bottom >= player.rect.top + player.change_y:
+                player.rect.y += player.change_y
+                player.change_y = 0
+
+            if item.rect.right >= player.rect.left + player.change_x:
+                player.rect.x += player.change_x
+                player.change_x = 0
+            elif item.rect.left <= player.rect.right + player.change_x:
+                player.rect.x += player.change_x
+                player.change_x = 0
 
     screen.fill(OCEAN_BLUE)
-
     background_group.draw(screen)
     tile_group.draw(screen)
     player_group.draw(screen)

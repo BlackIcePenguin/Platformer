@@ -31,24 +31,31 @@ TILE_SIZE = 32
 SIZE = (SCREEN_WIDTH, SCREEN_HEIGHT)
 
 # Cyberpunk assets: Artwork created by Luis Zuno @ansimuz
-temp_char = "warped city files/SPRITES/player/idle/idle-1.png"
+temp_char = "warped city files/SPRITES/player/PlayerInit.png"
 
 # Setting up all of the movement lists
 Walk_Right_List = []
 for i in range(1, 17):
     image = pygame.image.load(f"warped city files/SPRITES/player/walk/walk-{i}.png")
-    Walk_Right_List.append(image)
+    crop = image.subsurface((24, 14, 28, 53))
+    Walk_Right_List.append(crop)
 Walk_Left_List = [pygame.transform.flip(player, True, False) for player in Walk_Right_List]
 Idle_List = []
 for i in range(1, 5):
     image = pygame.image.load(f"warped city files/SPRITES/player/idle/idle-{i}.png")
-    Idle_List.append(image)
+    crop = image.subsurface((26, 16, 24, 51))
+    Idle_List.append(crop)
 Run_Right_List = []
 for i in range(1, 9):
     image = pygame.image.load(f"warped city files/SPRITES/player/run/run-{i}.png")
-    Run_Right_List.append(image)
+    crop = image.subsurface((10, 16, 45, 51))
+    Run_Right_List.append(crop)
 Run_Left_List = [pygame.transform.flip(player, True, False) for player in Run_Right_List]
-
+Air_List = []
+for i in range(1, 5):
+    image = pygame.image.load(f"warped city files/SPRITES/player/jump/jump-{i}.png")
+    crop = image.subsurface((10, 14, 45, 53))
+    Air_List.append(crop)
 # Layout, current is for testing the character
 LAYOUT = ["BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
           "L00000000P0P000000000000000000P0000",
@@ -75,6 +82,32 @@ LAYOUT = ["BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
           "L000000P000P0000000000000P00000000R",
           "L000000P00000000000000000000000000R",
           "BBBBBBBBB00000BBBBBBBBB00000BBBBBBB"]
+
+# LAYOUT1 = ["00000000000000000000000000000000000",
+#           "00000000000000000000000000000000000",
+#           "00000000000000000000000000000000000",
+#           "00000000000000000000000000000000000",
+#           "00000000000000000000000000000000000",
+#           "00000000000000000000000000000000000",
+#           "00000000000000000000000000000000000",
+#           "00000000000000000000000000000000000",
+#           "00000000000000000000000000000000000",
+#           "00000000000000000000000000000000000",
+#           "00000000000000000000000000000000000",
+#           "00000000000000000000000000000000000",
+#           "00000000000000000000000000000000000",
+#           "00000000000000000000000000000000000",
+#           "00000000000000000000000000000000000",
+#           "00000000000000000000000000000000000",
+#           "00000000000000000000000000000000000",
+#           "00000000000000000000000000000000000",
+#           "0000000000000000LR00000000000000000",
+#           "0000000000000000LR00000000000000000",
+#           "0000000000000000LR00000000000000000",
+#           "0000000000000000LR00000000000000000",
+#           "0000000000000000LR00000000000000000",
+#           "0000000000000000LR00000000000000000",
+#           "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"]
 
 LAYOUT_LENGTH = len(LAYOUT[0])
 LAYOUT_HEIGHT = len(LAYOUT)

@@ -1,17 +1,18 @@
 import pygame
 import random
 from Parameters import *
-
 pygame.init()
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, image_path, collide_list):
+    def __init__(self, image_path):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load(image_path)
         self.rect = self.image.get_rect()
         self.rect.center = SCREEN_WIDTH // 2, SCREEN_HEIGHT - self.rect.height
         self.prev_update = pygame.time.get_ticks()
+        self.rect.x = 64
+        self.rect.y = SCREEN_HEIGHT - 100
         self.change_x = 0
         self.change_y = 0
         self.frame = 0
@@ -20,22 +21,17 @@ class Player(pygame.sprite.Sprite):
         self.run = False
         self.right = True
         self.left = False
-        self.airborne = False
+        self.jumping = False
+        self.falling = False
         self.moving = True
-        self.collide_list = []
-        self.collide_list.append(self.rect)
-        for item in collide_list:
-            rect = item.getrect()
-            self.collide_list.append(rect)
-        print(collide_list)
+        self.air_L = False
 
     def update(self):
         current_time = pygame.time.get_ticks()
         self.rect.x += self.change_x
         self.rect.y += self.change_y
 
-        pygame.draw.rect(self.image, WHITE, [0, 0, self.rect.width, self.rect.height])
-
+        #pygame.draw.rect(self.image, WHITE, [0, 0, self.rect.width, self.rect.height])
         keys = pygame.key.get_pressed()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -45,8 +41,25 @@ class Player(pygame.sprite.Sprite):
                     break
 
         if keys[pygame.K_LSHIFT]:
-            print(3)
             self.run = True
+
+        if keys[pygame.K_LCTRL]:
+            self.walk = True
+
+        if keys[pygame.K_UP] and not self.jumping and not self.falling:
+            self.jumping = True
+            self.change_y = -10
+        else:
+            self.jumping = False
+        self.change_y += 0.3
+        if self.change_y <= 0:
+            self.jumping = False
+            self.falling = True
+        if self.change_y >= 10:
+            self.change_y = 10
+
+        if keys[pygame.K_DOWN]:
+            self.jumping = False
 
         if keys[pygame.K_RIGHT]:
             self.change_x = 2
@@ -54,19 +67,16 @@ class Player(pygame.sprite.Sprite):
             self.left = False
             self.moving = True
             self.walk = True
+
         elif keys[pygame.K_LEFT]:
             self.change_x = -2
             self.right = False
             self.left = True
             self.moving = True
             self.walk = True
-        elif keys[pygame.K_UP]:
-            self.change_y = -4
-        elif keys[pygame.K_DOWN]:
-            self.change_y = 4
+
         else:
             self.change_x = 0
-            self.change_y = 0
 
         for event in pygame.event.get():
             if event.type == pygame.KEYUP:
@@ -80,14 +90,17 @@ class Player(pygame.sprite.Sprite):
         if self.rect.top + self.change_y <= 0 or self.rect.bottom + self.change_y >= SCREEN_HEIGHT:
             self.change_y = 0
 
-        # if pygame.Rect.collidelistall(self.collide_list):
-        #    pass
+        if self.run:
+            self.change_x *= 2
 
         if current_time - self.prev_update > self.frame_rate:
             self.prev_update = current_time
             self.frame += 1
-        if self.run:
-            self.change_x *= 2
+        if self.falling or self.jumping:
+            if self.frame > len(Air_List) - 1:
+                self.frame = 0
+            self.image = Air_List[self.frame]
+        elif self.run:
             if self.right:
                 if self.frame > len(Run_Right_List) - 1:
                     self.frame = 0
@@ -105,8 +118,6 @@ class Player(pygame.sprite.Sprite):
                 if self.frame > len(Walk_Left_List) - 1:
                     self.frame = 0
                 self.image = Walk_Left_List[self.frame]
-        elif self.airborne:
-            pass
         else:
             if self.frame > len(Idle_List) - 1:
                 self.frame = 0
