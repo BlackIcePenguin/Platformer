@@ -13,6 +13,8 @@ class Player(pygame.sprite.Sprite):
         self.prev_update = pygame.time.get_ticks()
         self.rect.x = 64
         self.rect.y = SCREEN_HEIGHT - 100
+        self.x_init = self.rect.x
+        self.y_init = self.rect.y
         self.change_x = 0
         self.change_y = 0
         self.frame = 0
@@ -89,6 +91,8 @@ class Player(pygame.sprite.Sprite):
             self.change_x = 0
         if self.rect.top + self.change_y <= 0 or self.rect.bottom + self.change_y >= SCREEN_HEIGHT:
             self.change_y = 0
+            self.rect.x = self.x_init
+            self.rect.y = self.y_init
 
         if self.run:
             self.change_x *= 2

@@ -13,6 +13,7 @@ running = True
 player_group = pygame.sprite.Group()
 tile_group = pygame.sprite.Group()
 background_group = pygame.sprite.Group()
+danger_group = pygame.sprite.Group()
 all_sprites = pygame.sprite.Group()
 
 tile_map = SpriteSheet("warped city files/ENVIRONMENT/tileset.png")
@@ -28,6 +29,8 @@ block = tile_map.image_at((336, 16, 16, 16))
 block = pygame.transform.scale2x(block)
 pillar = tile_map.image_at((192, 16, 16, 48))
 pillar = pygame.transform.scale2x(pillar)
+death_ball = pygame.image.load("warped city files/SPRITES/misc/hurt_block.png")
+#death_ball = pygame.transform.scale2x(death_ball)
 
 player = Player(temp_char)
 player_group.add(player)
@@ -52,7 +55,10 @@ for row_val in range(0, LAYOUT_LENGTH):
             tile = Tiles(screen, trapezoid_plat, TILE_SIZE * row_val, TILE_SIZE * column_val)
             tile_group.add(tile)
             all_sprites.add(tile)
-
+        elif LAYOUT[column_val][row_val] == 'D':
+            tile = Tiles(screen, death_ball, TILE_SIZE * row_val, TILE_SIZE * column_val)
+            danger_group.add(tile)
+            all_sprites.add(tile)
 
 # For tiles without Collision
 for row_val in range(0, LAYOUT_LENGTH):
@@ -94,10 +100,16 @@ while running:
                 player.rect.x += player.change_x
                 player.change_x = 0
 
+    for item in danger_group:
+        if pygame.sprite.collide_rect(player, item):
+            player.rect.x = player.x_init
+            player.rect.y = player.y_init
+
     screen.fill(OCEAN_BLUE)
     background_group.draw(screen)
     tile_group.draw(screen)
     player_group.draw(screen)
+    danger_group.draw(screen)
 
     if player.update() == 3:
         break
