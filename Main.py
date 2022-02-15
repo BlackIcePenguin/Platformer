@@ -1,7 +1,7 @@
 import pygame
 import random
 from Parameters import *
-from Sprites import Player, SpriteSheet, Tiles
+from Sprites import Player, SpriteSheet, Tiles, SavePoint
 
 pygame.init()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -9,12 +9,6 @@ pygame.display.set_caption("Platformer")
 clock = pygame.time.Clock()
 
 running = True
-
-player_group = pygame.sprite.Group()
-tile_group = pygame.sprite.Group()
-background_group = pygame.sprite.Group()
-danger_group = pygame.sprite.Group()
-all_sprites = pygame.sprite.Group()
 
 tile_map = SpriteSheet("warped city files/ENVIRONMENT/tileset.png")
 
@@ -29,12 +23,11 @@ block = tile_map.image_at((336, 16, 16, 16))
 block = pygame.transform.scale2x(block)
 pillar = tile_map.image_at((192, 16, 16, 48))
 pillar = pygame.transform.scale2x(pillar)
-death_ball = pygame.image.load("warped city files/SPRITES/misc/hurt_block.png")
-#death_ball = pygame.transform.scale2x(death_ball)
+death_block = pygame.image.load("warped city files/SPRITES/misc/hurt_block.png")
+booster_block = pygame.image.load("warped city files/SPRITES/misc/booster.png")
 
 player = Player(temp_char)
 player_group.add(player)
-# all_sprites.add(player)
 
 # For tiles with Collision
 for row_val in range(0, LAYOUT_LENGTH):
@@ -56,8 +49,12 @@ for row_val in range(0, LAYOUT_LENGTH):
             tile_group.add(tile)
             all_sprites.add(tile)
         elif LAYOUT[column_val][row_val] == 'D':
-            tile = Tiles(screen, death_ball, TILE_SIZE * row_val, TILE_SIZE * column_val)
+            tile = Tiles(screen, death_block, TILE_SIZE * row_val, TILE_SIZE * column_val)
             danger_group.add(tile)
+            all_sprites.add(tile)
+        elif LAYOUT[column_val][row_val] == '^':
+            tile = Tiles(screen, booster_block, TILE_SIZE * row_val, TILE_SIZE * column_val)
+            lift_group.add(tile)
             all_sprites.add(tile)
 
 # For tiles without Collision
@@ -67,24 +64,48 @@ for row_val in range(0, LAYOUT_LENGTH):
             background = Tiles(screen, pillar, TILE_SIZE * row_val, TILE_SIZE * column_val)
             background_group.add(background)
             all_sprites.add(background)
+        elif LAYOUT[column_val][row_val] == 'F':
+            flag = SavePoint(screen, TILE_SIZE * row_val, TILE_SIZE * column_val)
+            flag_group.add(flag)
+            all_sprites.add(flag)
 
 while running:
 
+    player_respawn_flag = False
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_q:
                 running = False
+    if player.left:
+        player_collide = pygame.Rect(player.rect.x + player.change_x, player.rect.y + player.change_y,
+                                     player.rect.width - player.change_x, player.rect.height + 3)
+    else:
+        player_collide = pygame.Rect(player.rect.x + player.change_x, player.rect.y + player.change_y,
+                                     player.rect.width + player.change_x, player.rect.height + 3)
 
-    floor = False
-    r_wall = False
-    l_wall = False
-    roof = False
-
-    for item in tile_group:
+    for tile in tile_group:
+        tile_rect = pygame.Rect.copy(tile.rect)
+        if pygame.Rect.colliderect(tile_rect, player_collide):
+            if tile_rect.midleft <= player_collide.midright:
+                if player.change_x > 0:
+                    player.change_x = 0
+            if tile_rect.midright >= player_collide.midleft:
+                if player.change_x < 0:
+                    player.change_x = 0
+            if tile_rect.bottom >= player_collide.top:
+                if player.change_y < 0:
+                    player.change_y = 0
+            if tile_rect.top <= player_collide.bottom:
+                while pygame.Rect.colliderect(player.rect, tile_rect):
+                    player.rect.y -= 1
+                if player.change_y > 0:
+                    player.change_y = 0
+                player.falling = False
+    for item in lift_group:
         if pygame.sprite.collide_rect(player, item):
-            if item.rect.top <= player.rect.bottom + player.change_y:
+            if item.rect.top <= player_collide.bottom + player.change_y:
                 player.rect.y -= player.change_y
                 player.falling = False
                 player.change_y = 0
@@ -100,6 +121,21 @@ while running:
                 player.rect.x += player.change_x
                 player.change_x = 0
 
+    if player.scroll_x:
+        for item in all_sprites:
+            item.change_x = -player.change_x
+    if player.scroll_y:
+        for item in all_sprites:
+            item.change_y = -player.change_y
+    for item in flag_group:
+        if pygame.sprite.collide_rect(player, item) and not item.active:
+            for flag in flag_group:
+                flag.active = False
+            item.active = True
+        if item.active:
+            player.x_init = item.rect.x
+            player.y_init = item.rect.top
+
     for item in danger_group:
         if pygame.sprite.collide_rect(player, item):
             player.rect.x = player.x_init
@@ -107,13 +143,42 @@ while running:
 
     screen.fill(OCEAN_BLUE)
     background_group.draw(screen)
+    pygame.draw.rect(screen, YELLOW, player_collide, width=0)
+    pygame.draw.rect(screen, RED, player.rect, width=0)
     tile_group.draw(screen)
     player_group.draw(screen)
+    lift_group.draw(screen)
     danger_group.draw(screen)
+    flag_group.draw(screen)
 
     if player.update() == 3:
         break
+    if player.danger:
+        if 0 < player.x_init < SCREEN_WIDTH and 0 < player.y_init < SCREEN_HEIGHT:
+            player.rect.x = player.x_init
+            player.rect.y = player.y_init
+        else:
+            if player.x_init < 0:
+                shift_x_change = (SCREEN_WIDTH / 10) - player.x_init
+                for flag in flag_group:
+                    if flag.active:
+                        player.rect.y = flag.rect.y
+                for item in all_sprites:
+                    item.change_x = shift_x_change
+                player_respawn_flag = True
+            elif player.x_init > SCREEN_WIDTH:
+                shift_x_change = (SCREEN_WIDTH * 0.9) - player.x_init
+                for item in all_sprites:
+                    item.change_x = shift_x_change
+                player_respawn_flag = True
     all_sprites.update()
+    if player_respawn_flag:
+        for flag in flag_group:
+            if active_flag:
+                player.x_init = flag.rect.x
+                player.y_init = flag.rect.top
+        player.rect.x = player.x_init
+        player.rect.y = player.y_init
     pygame.display.flip()
 
     clock.tick(FPS)

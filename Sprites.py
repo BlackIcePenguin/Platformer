@@ -27,13 +27,19 @@ class Player(pygame.sprite.Sprite):
         self.falling = False
         self.moving = True
         self.air_L = False
+        self.scroll_x = False
+        self.scroll_y = False
+        self.danger = False
 
     def update(self):
         current_time = pygame.time.get_ticks()
-        self.rect.x += self.change_x
-        self.rect.y += self.change_y
+        if not self.scroll_x:
+            self.rect.x += self.change_x
+        if not self.scroll_y:
+            self.rect.y += self.change_y
 
-        #pygame.draw.rect(self.image, WHITE, [0, 0, self.rect.width, self.rect.height])
+        # pygame.draw.rect(self.image, WHITE, [0, 0, self.rect.width, self.rect.height])
+
         keys = pygame.key.get_pressed()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -42,6 +48,8 @@ class Player(pygame.sprite.Sprite):
                 if event.key == pygame.K_q:
                     break
 
+        if keys[pygame.K_SPACE]:
+            self.change_y = -10
         if keys[pygame.K_LSHIFT]:
             self.run = True
 
@@ -69,6 +77,10 @@ class Player(pygame.sprite.Sprite):
             self.left = False
             self.moving = True
             self.walk = True
+            if self.rect.right + self.change_x >= SCREEN_WIDTH * 0.8:
+                self.scroll_x = True
+            else:
+                self.scroll_x = False
 
         elif keys[pygame.K_LEFT]:
             self.change_x = -2
@@ -76,6 +88,10 @@ class Player(pygame.sprite.Sprite):
             self.left = True
             self.moving = True
             self.walk = True
+            if self.rect.left + self.change_x <= SCREEN_WIDTH * 0.2:
+                self.scroll_x = True
+            else:
+                self.scroll_x = False
 
         else:
             self.change_x = 0
@@ -91,8 +107,9 @@ class Player(pygame.sprite.Sprite):
             self.change_x = 0
         if self.rect.top + self.change_y <= 0 or self.rect.bottom + self.change_y >= SCREEN_HEIGHT:
             self.change_y = 0
-            self.rect.x = self.x_init
-            self.rect.y = self.y_init
+            self.danger = True
+        else:
+            self.danger = False
 
         if self.run:
             self.change_x *= 2
@@ -143,10 +160,36 @@ class Tiles(pygame.sprite.Sprite):
         self.rect.y = y
         self.x_shift = self.rect.width
         self.y_shift = self.rect.height
+        self.change_x = 0
+        self.change_y = 0
 
     def update(self):
-        pass
+        self.rect.x += self.change_x
+        self.rect.y += self.change_y
 
+
+class SavePoint(pygame.sprite.Sprite):
+    def __init__(self, display, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.display = display
+        self.image = disabled_flag
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+        self.change_x = 0
+        self.change_y = 0
+        self.active = False
+
+    def store_state(self):
+        if self.active:
+            self.image = active_flag
+        if not self.active:
+            self.image = disabled_flag
+
+    def update(self):
+        self.rect.x += self.change_x
+        self.rect.y += self.change_y
+        self.store_state()
 
 
 class SpriteSheet:
