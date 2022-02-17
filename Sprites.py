@@ -11,8 +11,8 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = SCREEN_WIDTH // 2, SCREEN_HEIGHT - self.rect.height
         self.prev_update = pygame.time.get_ticks()
-        self.rect.x = 64
-        self.rect.y = SCREEN_HEIGHT - 100
+        self.rect.x = 240
+        self.rect.y = SCREEN_HEIGHT - 150
         self.x_init = self.rect.x
         self.y_init = self.rect.y
         self.change_x = 0
@@ -95,6 +95,14 @@ class Player(pygame.sprite.Sprite):
 
         else:
             self.change_x = 0
+
+        if self.scroll_x:
+            if self.left:
+                if self.rect.left + self.change_x > SCREEN_WIDTH * 0.2:
+                    self.scroll_x = False
+            if self.right:
+                if self.rect.right + self.change_x < SCREEN_WIDTH * 0.8:
+                    self.scroll_x = False
 
         for event in pygame.event.get():
             if event.type == pygame.KEYUP:

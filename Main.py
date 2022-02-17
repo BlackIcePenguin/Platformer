@@ -13,6 +13,12 @@ running = True
 tile_map = SpriteSheet("warped city files/ENVIRONMENT/tileset.png")
 
 # Getting all of the sprites to work, looks messy cause of how much transforming and due to a non gird spritesheet
+background0 = pygame.image.load('warped city files/ENVIRONMENT/background/skyline-a.png')
+background0 = pygame.transform.scale2x(background0)
+background0 = pygame.transform.scale2x(background0)
+background1 = pygame.image.load('warped city files/ENVIRONMENT/background/skyline-b.png')
+background1 = pygame.transform.scale2x(background1)
+background1 = pygame.transform.scale2x(background1)
 right_wall = tile_map.image_at((16, 16, 16, 48))
 right_wall = pygame.transform.scale2x(right_wall)
 left_wall = tile_map.image_at((112, 16, 16, 48))
@@ -103,6 +109,13 @@ while running:
                 if player.change_y > 0:
                     player.change_y = 0
                 player.falling = False
+    if player.rect.right > SCREEN_WIDTH:
+        while player.rect.right > SCREEN_WIDTH:
+            player.rect.x -= 1
+    elif player.rect.left < 0:
+        while player.rect.left < 0:
+            player.rect.x += 1
+
     for item in lift_group:
         if pygame.sprite.collide_rect(player, item):
             if item.rect.top <= player_collide.bottom + player.change_y:
@@ -122,8 +135,11 @@ while running:
                 player.change_x = 0
 
     if player.scroll_x:
-        for item in all_sprites:
-            item.change_x = -player.change_x
+        if player.moving:
+            for item in all_sprites:
+                item.change_x = -player.change_x
+        else:
+            pass
     if player.scroll_y:
         for item in all_sprites:
             item.change_y = -player.change_y
@@ -142,14 +158,18 @@ while running:
             player.rect.y = player.y_init
 
     screen.fill(OCEAN_BLUE)
+    screen.blit(background0, (0, 0))
+    screen.blit(background1, (503, 0))
+    screen.blit(background0, (1000, 0))
     background_group.draw(screen)
     pygame.draw.rect(screen, YELLOW, player_collide, width=0)
     pygame.draw.rect(screen, RED, player.rect, width=0)
     tile_group.draw(screen)
-    player_group.draw(screen)
     lift_group.draw(screen)
     danger_group.draw(screen)
     flag_group.draw(screen)
+
+    player_group.draw(screen)
 
     if player.update() == 3:
         break
@@ -159,7 +179,7 @@ while running:
             player.rect.y = player.y_init
         else:
             if player.x_init < 0:
-                shift_x_change = (SCREEN_WIDTH / 10) - player.x_init
+                shift_x_change = (SCREEN_WIDTH * 0.1) - player.x_init
                 for flag in flag_group:
                     if flag.active:
                         player.rect.y = flag.rect.y
