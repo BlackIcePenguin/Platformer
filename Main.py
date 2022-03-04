@@ -31,6 +31,7 @@ pillar = tile_map.image_at((192, 16, 16, 48))
 pillar = pygame.transform.scale2x(pillar)
 death_block = pygame.image.load("warped city files/SPRITES/misc/hurt_block.png")
 booster_block = pygame.image.load("warped city files/SPRITES/misc/booster.png")
+end_door = pygame.image.load("warped city files/SPRITES/misc/End_Door.png")
 
 player = Player(temp_char)
 player_group.add(player)
@@ -74,6 +75,10 @@ for row_val in range(0, LAYOUT_LENGTH):
             flag = SavePoint(screen, TILE_SIZE * row_val, TILE_SIZE * column_val)
             flag_group.add(flag)
             all_sprites.add(flag)
+        elif LAYOUT[column_val][row_val] == '#':
+            background = Tiles(screen, end_door, TILE_SIZE * row_val, TILE_SIZE * column_val)
+            background_group.add(background)
+            all_sprites.add(background)
 
 while running:
 
@@ -135,11 +140,14 @@ while running:
                 player.change_x = 0
 
     if player.scroll_x:
-        if player.moving:
+        if not player.idle:
             for item in all_sprites:
                 item.change_x = -player.change_x
         else:
             pass
+    elif not player.scroll_x:
+        for item in all_sprites:
+            item.change_x = 0
     if player.scroll_y:
         for item in all_sprites:
             item.change_y = -player.change_y

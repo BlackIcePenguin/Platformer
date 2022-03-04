@@ -25,11 +25,11 @@ class Player(pygame.sprite.Sprite):
         self.left = False
         self.jumping = False
         self.falling = False
-        self.moving = True
         self.air_L = False
         self.scroll_x = False
         self.scroll_y = False
         self.danger = False
+        self.idle = True
 
     def update(self):
         current_time = pygame.time.get_ticks()
@@ -75,7 +75,6 @@ class Player(pygame.sprite.Sprite):
             self.change_x = 2
             self.right = True
             self.left = False
-            self.moving = True
             self.walk = True
             if self.rect.right + self.change_x >= SCREEN_WIDTH * 0.8:
                 self.scroll_x = True
@@ -86,7 +85,6 @@ class Player(pygame.sprite.Sprite):
             self.change_x = -2
             self.right = False
             self.left = True
-            self.moving = True
             self.walk = True
             if self.rect.left + self.change_x <= SCREEN_WIDTH * 0.2:
                 self.scroll_x = True
@@ -100,9 +98,11 @@ class Player(pygame.sprite.Sprite):
             if self.left:
                 if self.rect.left + self.change_x > SCREEN_WIDTH * 0.2:
                     self.scroll_x = False
-            if self.right:
+            elif self.right:
                 if self.rect.right + self.change_x < SCREEN_WIDTH * 0.8:
                     self.scroll_x = False
+            if self.idle:
+                self.scroll_x = False
 
         for event in pygame.event.get():
             if event.type == pygame.KEYUP:
@@ -111,6 +111,7 @@ class Player(pygame.sprite.Sprite):
                 if event.key == pygame.K_RIGHT or pygame.K_LEFT:
                     self.walk = False
 
+        # Setting up kill planes on edges of screen
         if self.rect.left + self.change_x <= 0 or self.rect.right + self.change_x >= SCREEN_WIDTH:
             self.change_x = 0
         if self.rect.top + self.change_y <= 0 or self.rect.bottom + self.change_y >= SCREEN_HEIGHT:
@@ -119,12 +120,14 @@ class Player(pygame.sprite.Sprite):
         else:
             self.danger = False
 
+        # The run speed multiplier, may make this accelerating
         if self.run:
             self.change_x *= 2
 
         if current_time - self.prev_update > self.frame_rate:
             self.prev_update = current_time
             self.frame += 1
+        self.idle = False
         if self.falling or self.jumping:
             if self.frame > len(Air_List) - 1:
                 self.frame = 0
@@ -151,7 +154,7 @@ class Player(pygame.sprite.Sprite):
             if self.frame > len(Idle_List) - 1:
                 self.frame = 0
             self.image = Idle_List[self.frame]
-
+            self.idle = True
         self.walk = False
         self.run = False
 
@@ -174,6 +177,16 @@ class Tiles(pygame.sprite.Sprite):
     def update(self):
         self.rect.x += self.change_x
         self.rect.y += self.change_y
+
+
+class Enemy(pygame.sprite.Sprite):
+    def __init__(self, display, enemy_type, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.display = display
+        self.image = enemy_type
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
 
 
 class SavePoint(pygame.sprite.Sprite):
