@@ -1,7 +1,7 @@
 import pygame
 import random
 from Parameters import *
-from Sprites import Player, SpriteSheet, Tiles, SavePoint
+from Sprites import Player, SpriteSheet, Tiles, SavePoint, Enemy
 
 pygame.init()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -32,6 +32,7 @@ pillar = pygame.transform.scale2x(pillar)
 death_block = pygame.image.load("warped city files/SPRITES/misc/hurt_block.png")
 booster_block = pygame.image.load("warped city files/SPRITES/misc/booster.png")
 end_door = pygame.image.load("warped city files/SPRITES/misc/End_Door.png")
+drone = pygame.image.load("warped city files/SPRITES/misc/drone/drone-1.png")
 
 player = Player(temp_char)
 player_group.add(player)
@@ -63,6 +64,10 @@ for row_val in range(0, LAYOUT_LENGTH):
             tile = Tiles(screen, booster_block, TILE_SIZE * row_val, TILE_SIZE * column_val)
             lift_group.add(tile)
             all_sprites.add(tile)
+        elif LAYOUT[column_val][row_val] == 'E':
+            enemy = Enemy(screen, drone, TILE_SIZE * row_val, TILE_SIZE * column_val, 64)
+            enemy_group.add(enemy)
+
 
 # For tiles without Collision
 for row_val in range(0, LAYOUT_LENGTH):
@@ -170,6 +175,7 @@ while running:
     screen.blit(background1, (503, 0))
     screen.blit(background0, (1000, 0))
     background_group.draw(screen)
+    enemy_group.draw(screen)
     pygame.draw.rect(screen, YELLOW, player_collide, width=0)
     pygame.draw.rect(screen, RED, player.rect, width=0)
     tile_group.draw(screen)
@@ -178,6 +184,8 @@ while running:
     flag_group.draw(screen)
 
     player_group.draw(screen)
+    for instance in enemy_group:
+        instance.update()
 
     if player.update() == 3:
         break

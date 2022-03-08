@@ -180,13 +180,23 @@ class Tiles(pygame.sprite.Sprite):
 
 
 class Enemy(pygame.sprite.Sprite):
-    def __init__(self, display, enemy_type, x, y):
+    def __init__(self, display, enemy_type, x, y, distance_offset):
         pygame.sprite.Sprite.__init__(self)
         self.display = display
         self.image = enemy_type
         self.rect = self.image.get_rect()
         self.rect.x = x
+        self.rect_init = x
         self.rect.y = y
+        self.change_x = 1
+        self.patrol_range = distance_offset
+
+    def update(self):
+        self.rect.x += self.change_x
+        if self.rect.x > self.rect_init + self.patrol_range and self.change_x > 0:
+            self.change_x *= -1
+        elif self.rect.x < self.rect_init - self.patrol_range and self.change_x < 0:
+            self.change_x *= -1
 
 
 class SavePoint(pygame.sprite.Sprite):
