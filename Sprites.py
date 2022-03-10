@@ -48,8 +48,6 @@ class Player(pygame.sprite.Sprite):
                 if event.key == pygame.K_q:
                     break
 
-        if keys[pygame.K_SPACE]:
-            self.change_y = -10
         if keys[pygame.K_LSHIFT]:
             self.run = True
 
@@ -59,10 +57,11 @@ class Player(pygame.sprite.Sprite):
         if keys[pygame.K_UP] and not self.jumping and not self.falling:
             self.jumping = True
             self.change_y = -10
-        else:
-            self.jumping = False
+        if keys[pygame.K_SPACE] and not self.jumping and not self.falling:
+            self.jumping = True
+            self.change_y = -10
         self.change_y += 0.3
-        if self.change_y <= 0:
+        if self.change_y >= 0 and self.jumping:
             self.jumping = False
             self.falling = True
         if self.change_y >= 10:
@@ -183,7 +182,8 @@ class Enemy(pygame.sprite.Sprite):
     def __init__(self, display, enemy_type, x, y, distance_offset):
         pygame.sprite.Sprite.__init__(self)
         self.display = display
-        self.image = enemy_type
+        self.image = pygame.transform.flip(enemy_type, True, False)
+        self.image_placeholder = enemy_type
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect_init = x
@@ -194,9 +194,11 @@ class Enemy(pygame.sprite.Sprite):
     def update(self):
         self.rect.x += self.change_x
         if self.rect.x > self.rect_init + self.patrol_range and self.change_x > 0:
+            self.image = self.image_placeholder
             self.change_x *= -1
         elif self.rect.x < self.rect_init - self.patrol_range and self.change_x < 0:
             self.change_x *= -1
+            self.image = pygame.transform.flip(self.image_placeholder, True, False)
 
 
 class SavePoint(pygame.sprite.Sprite):

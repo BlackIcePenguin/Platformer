@@ -94,13 +94,14 @@ while running:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_q:
                 running = False
+    # Adds the extending hitbox to make sure the player can collide properly
     if player.left:
         player_collide = pygame.Rect(player.rect.x + player.change_x, player.rect.y + player.change_y,
                                      player.rect.width - player.change_x, player.rect.height + 3)
     else:
         player_collide = pygame.Rect(player.rect.x + player.change_x, player.rect.y + player.change_y,
                                      player.rect.width + player.change_x, player.rect.height + 3)
-
+    # All of the collision, was hard to get right
     for tile in tile_group:
         tile_rect = pygame.Rect.copy(tile.rect)
         if pygame.Rect.colliderect(tile_rect, player_collide):
@@ -125,7 +126,7 @@ while running:
     elif player.rect.left < 0:
         while player.rect.left < 0:
             player.rect.x += 1
-
+    # The lift item code, kinda wonky, was the initial try at collision
     for item in lift_group:
         if pygame.sprite.collide_rect(player, item):
             if item.rect.top <= player_collide.bottom + player.change_y:
@@ -144,10 +145,14 @@ while running:
                 player.rect.x += player.change_x
                 player.change_x = 0
 
+    # Defining the rules for the scrolling
     if player.scroll_x:
         if not player.idle:
             for item in all_sprites:
                 item.change_x = -player.change_x
+            for item in enemy_group:
+                item.rect.x += -player.change_x
+                item.rect_init += -player.change_x
         else:
             pass
     elif not player.scroll_x:
@@ -156,6 +161,7 @@ while running:
     if player.scroll_y:
         for item in all_sprites:
             item.change_y = -player.change_y
+    # Sets flags as the active one and does collision for them
     for item in flag_group:
         if pygame.sprite.collide_rect(player, item) and not item.active:
             for flag in flag_group:
@@ -164,12 +170,13 @@ while running:
         if item.active:
             player.x_init = item.rect.x
             player.y_init = item.rect.top
-
+    # Code to send player back when they "die"
     for item in danger_group:
         if pygame.sprite.collide_rect(player, item):
             player.rect.x = player.x_init
             player.rect.y = player.y_init
 
+    # Drawing all of the images and sprites
     screen.fill(OCEAN_BLUE)
     screen.blit(background0, (0, 0))
     screen.blit(background1, (503, 0))
@@ -184,11 +191,23 @@ while running:
     flag_group.draw(screen)
 
     player_group.draw(screen)
+    # Updating the enemies and player
     for instance in enemy_group:
         instance.update()
-
+    # Running the player update, the equals 3 just makes sure that the quit key works in the loop
     if player.update() == 3:
         break
+    # Checking for the enemy collision
+    for instance in enemy_group:
+        if pygame.sprite.collide_rect(instance, player):
+            if instance.rect.centery <= player.rect.bottom:
+                player.danger = True
+            elif instance.rect.centery > player.rect.bottom:
+                player.change_y = -10
+            else:
+                pass
+
+    # The respawning code, works when the player activates the danger state, i.e. Dies
     if player.danger:
         if 0 < player.x_init < SCREEN_WIDTH and 0 < player.y_init < SCREEN_HEIGHT:
             player.rect.x = player.x_init
@@ -201,13 +220,21 @@ while running:
                         player.rect.y = flag.rect.y
                 for item in all_sprites:
                     item.change_x = shift_x_change
+                for item in enemy_group:
+                    item.rect.x += shift_x_change
+                    item.rect_init += shift_x_change
                 player_respawn_flag = True
             elif player.x_init > SCREEN_WIDTH:
                 shift_x_change = (SCREEN_WIDTH * 0.9) - player.x_init
                 for item in all_sprites:
                     item.change_x = shift_x_change
+                for item in enemy_group:
+                    item.rect.x += shift_x_change
+                    item.rect_init += shift_x_change
                 player_respawn_flag = True
+    # Updates everything else
     all_sprites.update()
+    # Tells the game where to send the player
     if player_respawn_flag:
         for flag in flag_group:
             if active_flag:
