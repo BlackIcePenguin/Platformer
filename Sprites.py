@@ -28,6 +28,8 @@ class Player(pygame.sprite.Sprite):
         self.air_L = False
         self.scroll_x = False
         self.scroll_y = False
+        self.move_cam = False
+        self.cam_direct = 2
         self.danger = False
         self.idle = True
 
@@ -45,7 +47,7 @@ class Player(pygame.sprite.Sprite):
             if event.type == pygame.QUIT:
                 return 3
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_q:
+                if event.key == pygame.K_ESCAPE:
                     break
 
         if keys[pygame.K_LSHIFT]:
@@ -54,10 +56,16 @@ class Player(pygame.sprite.Sprite):
         if keys[pygame.K_LCTRL]:
             self.walk = True
 
+        if keys[pygame.K_SLASH]:
+            self.change_y = -10
+
         if keys[pygame.K_UP] and not self.jumping and not self.falling:
             self.jumping = True
             self.change_y = -10
-        if keys[pygame.K_SPACE] and not self.jumping and not self.falling:
+        elif keys[pygame.K_SPACE] and not self.jumping and not self.falling:
+            self.jumping = True
+            self.change_y = -10
+        elif keys[pygame.K_w] and not self.jumping and not self.falling:
             self.jumping = True
             self.change_y = -10
         self.change_y += 0.3
@@ -67,10 +75,10 @@ class Player(pygame.sprite.Sprite):
         if self.change_y >= 10:
             self.change_y = 10
 
-        if keys[pygame.K_DOWN]:
-            self.jumping = False
+        if keys[pygame.K_DOWN] or keys[pygame.K_s]:
+            pass
 
-        if keys[pygame.K_RIGHT]:
+        if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
             self.change_x = 2
             self.right = True
             self.left = False
@@ -80,7 +88,7 @@ class Player(pygame.sprite.Sprite):
             else:
                 self.scroll_x = False
 
-        elif keys[pygame.K_LEFT]:
+        elif keys[pygame.K_LEFT] or keys[pygame.K_a]:
             self.change_x = -2
             self.right = False
             self.left = True
@@ -92,6 +100,16 @@ class Player(pygame.sprite.Sprite):
 
         else:
             self.change_x = 0
+
+        if keys[pygame.K_q]:
+            self.move_cam = True
+            self.cam_direct = 0
+        elif keys[pygame.K_e]:
+            self.move_cam = True
+            self.cam_direct = 1
+        else:
+            self.move_cam = False
+            self.cam_direct = 2
 
         if self.scroll_x:
             if self.left:

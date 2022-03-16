@@ -92,7 +92,7 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_q:
+            if event.key == pygame.K_ESCAPE:
                 running = False
     # Adds the extending hitbox to make sure the player can collide properly
     if player.left:
@@ -161,6 +161,25 @@ while running:
     if player.scroll_y:
         for item in all_sprites:
             item.change_y = -player.change_y
+
+    if player.move_cam:
+        if player.cam_direct == 0:
+            if player.rect.x + 2 < SCREEN_WIDTH * 0.8:
+                for item in all_sprites:
+                    item.rect.x += 2
+                for item in enemy_group:
+                    item.rect.x += 2
+                    item.rect_init += 2
+                player.rect.x += 2
+        if player.cam_direct == 1:
+            if player.rect.x - 2 > SCREEN_WIDTH * 0.2:
+                for item in all_sprites:
+                    item.rect.x -= 2
+                for item in enemy_group:
+                    item.rect.x -= 2
+                    item.rect_init -= 2
+                player.rect.x -= 2
+
     # Sets flags as the active one and does collision for them
     for item in flag_group:
         if pygame.sprite.collide_rect(player, item) and not item.active:
@@ -183,8 +202,8 @@ while running:
     screen.blit(background0, (1000, 0))
     background_group.draw(screen)
     enemy_group.draw(screen)
-    pygame.draw.rect(screen, YELLOW, player_collide, width=0)
-    pygame.draw.rect(screen, RED, player.rect, width=0)
+    # pygame.draw.rect(screen, YELLOW, player_collide, width=0)
+    # pygame.draw.rect(screen, RED, player.rect, width=0)
     tile_group.draw(screen)
     lift_group.draw(screen)
     danger_group.draw(screen)
