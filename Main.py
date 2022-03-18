@@ -1,5 +1,3 @@
-import pygame
-import random
 from Parameters import *
 from Sprites import Player, SpriteSheet, Tiles, SavePoint, Enemy
 
@@ -37,53 +35,66 @@ drone = pygame.image.load("warped city files/SPRITES/misc/drone/drone-1.png")
 player = Player(temp_char)
 player_group.add(player)
 
-# For tiles with Collision
-for row_val in range(0, LAYOUT_LENGTH):
-    for column_val in range(0, LAYOUT_HEIGHT):
-        if LAYOUT[column_val][row_val] == 'B':
-            tile = Tiles(screen, block, TILE_SIZE * row_val, TILE_SIZE * column_val)
-            tile_group.add(tile)
-            all_sprites.add(tile)
-        elif LAYOUT[column_val][row_val] == 'R':
-            tile = Tiles(screen, right_wall, TILE_SIZE * row_val, TILE_SIZE * column_val)
-            tile_group.add(tile)
-            all_sprites.add(tile)
-        elif LAYOUT[column_val][row_val] == 'L':
-            tile = Tiles(screen, left_wall, TILE_SIZE * row_val, TILE_SIZE * column_val)
-            tile_group.add(tile)
-            all_sprites.add(tile)
-        elif LAYOUT[column_val][row_val] == 'T':
-            tile = Tiles(screen, trapezoid_plat, TILE_SIZE * row_val, TILE_SIZE * column_val)
-            tile_group.add(tile)
-            all_sprites.add(tile)
-        elif LAYOUT[column_val][row_val] == 'D':
-            tile = Tiles(screen, death_block, TILE_SIZE * row_val, TILE_SIZE * column_val)
-            danger_group.add(tile)
-            all_sprites.add(tile)
-        elif LAYOUT[column_val][row_val] == '^':
-            tile = Tiles(screen, booster_block, TILE_SIZE * row_val, TILE_SIZE * column_val)
-            lift_group.add(tile)
-            all_sprites.add(tile)
-        elif LAYOUT[column_val][row_val] == 'E':
-            enemy = Enemy(screen, drone, TILE_SIZE * row_val, TILE_SIZE * column_val, 64)
-            enemy_group.add(enemy)
+layout_number = 0
 
 
-# For tiles without Collision
-for row_val in range(0, LAYOUT_LENGTH):
-    for column_val in range(0, LAYOUT_HEIGHT):
-        if LAYOUT[column_val][row_val] == 'P':
-            background = Tiles(screen, pillar, TILE_SIZE * row_val, TILE_SIZE * column_val)
-            background_group.add(background)
-            all_sprites.add(background)
-        elif LAYOUT[column_val][row_val] == 'F':
-            flag = SavePoint(screen, TILE_SIZE * row_val, TILE_SIZE * column_val)
-            flag_group.add(flag)
-            all_sprites.add(flag)
-        elif LAYOUT[column_val][row_val] == '#':
-            background = Tiles(screen, end_door, TILE_SIZE * row_val, TILE_SIZE * column_val)
-            background_group.add(background)
-            all_sprites.add(background)
+def generate_level(level):
+    for sprite in all_sprites:
+        sprite.kill()
+    for sprite in enemy_group:
+        sprite.kill()
+    layout = level
+    layout_length = len(layout[0])
+    layout_height = len(layout)
+    # For tiles with Collision
+    for row_val in range(0, layout_length):
+        for column_val in range(0, layout_height):
+            if layout[column_val][row_val] == 'B':
+                tile = Tiles(screen, block, TILE_SIZE * row_val, TILE_SIZE * column_val)
+                tile_group.add(tile)
+                all_sprites.add(tile)
+            elif layout[column_val][row_val] == 'R':
+                tile = Tiles(screen, right_wall, TILE_SIZE * row_val, TILE_SIZE * column_val)
+                tile_group.add(tile)
+                all_sprites.add(tile)
+            elif layout[column_val][row_val] == 'L':
+                tile = Tiles(screen, left_wall, TILE_SIZE * row_val, TILE_SIZE * column_val)
+                tile_group.add(tile)
+                all_sprites.add(tile)
+            elif layout[column_val][row_val] == 'T':
+                tile = Tiles(screen, trapezoid_plat, TILE_SIZE * row_val, TILE_SIZE * column_val)
+                tile_group.add(tile)
+                all_sprites.add(tile)
+            elif layout[column_val][row_val] == 'D':
+                tile = Tiles(screen, death_block, TILE_SIZE * row_val, TILE_SIZE * column_val)
+                danger_group.add(tile)
+                all_sprites.add(tile)
+            elif layout[column_val][row_val] == '^':
+                tile = Tiles(screen, booster_block, TILE_SIZE * row_val, TILE_SIZE * column_val)
+                lift_group.add(tile)
+                all_sprites.add(tile)
+            elif layout[column_val][row_val] == 'E':
+                enemy = Enemy(screen, drone, TILE_SIZE * row_val, TILE_SIZE * column_val, 64)
+                enemy_group.add(enemy)
+
+    # For tiles without Collision
+    for row_val in range(0, layout_length):
+        for column_val in range(0, layout_height):
+            if layout[column_val][row_val] == 'P':
+                background = Tiles(screen, pillar, TILE_SIZE * row_val, TILE_SIZE * column_val)
+                background_group.add(background)
+                all_sprites.add(background)
+            elif layout[column_val][row_val] == 'F':
+                flag1 = SavePoint(screen, TILE_SIZE * row_val, TILE_SIZE * column_val)
+                flag_group.add(flag1)
+                all_sprites.add(flag1)
+            elif layout[column_val][row_val] == '#':
+                background = Tiles(screen, end_door, TILE_SIZE * row_val, TILE_SIZE * column_val)
+                door_group.add(background)
+                all_sprites.add(background)
+
+
+generate_level(layout_list[layout_number])
 
 while running:
 
@@ -102,8 +113,8 @@ while running:
         player_collide = pygame.Rect(player.rect.x + player.change_x, player.rect.y + player.change_y,
                                      player.rect.width + player.change_x, player.rect.height + 3)
     # All of the collision, was hard to get right
-    for tile in tile_group:
-        tile_rect = pygame.Rect.copy(tile.rect)
+    for item in tile_group:
+        tile_rect = pygame.Rect.copy(item.rect)
         if pygame.Rect.colliderect(tile_rect, player_collide):
             if tile_rect.midleft <= player_collide.midright:
                 if player.change_x > 0:
@@ -208,6 +219,7 @@ while running:
     lift_group.draw(screen)
     danger_group.draw(screen)
     flag_group.draw(screen)
+    door_group.draw(screen)
 
     player_group.draw(screen)
     # Updating the enemies and player
@@ -225,6 +237,14 @@ while running:
                 player.change_y = -10
             else:
                 pass
+
+    for door in door_group:
+        if pygame.sprite.collide_rect(door, player):
+            layout_number += 1
+            generate_level(layout_list[layout_number])
+            player.rect.x = 240
+            player.rect.y = SCREEN_HEIGHT - 150
+            # player.danger = True
 
     # The respawning code, works when the player activates the danger state, i.e. Dies
     if player.danger:

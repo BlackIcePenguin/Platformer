@@ -45,6 +45,7 @@ danger_group = pygame.sprite.Group()
 all_sprites = pygame.sprite.Group()
 lift_group = pygame.sprite.Group()
 flag_group = pygame.sprite.Group()
+door_group = pygame.sprite.Group()
 enemy_group = pygame.sprite.Group()
 
 active_flag = pygame.image.load('warped city files/SPRITES/misc/active_save_flag.png')
@@ -73,59 +74,58 @@ for i in range(1, 5):
     image = pygame.image.load(f"warped city files/SPRITES/player/jump/jump-{i}.png")
     crop = image.subsurface((10, 14, 45, 53))
     Air_List.append(crop)
-# Layout, current is for testing the character
-LAYOUT01 = ["BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
-            "L00000000P0P000000000000000000P0000",
-            "L00000000P0P00000000000000000000000",
-            "L0000000000000000000000000000000000",
-            "L00000000000000000000000000000P000B",
-            "L00000000P0P0000000000000000000000R",
-            "L000000000000000000000000000000000R",
-            "L0000000000000000000000000000T0000R",
-            "L00000000P0P0000000000000000000000R",
-            "L000000000000000000000000000000000R",
-            "L000000000000000000000000000000000R",
-            "L00000000T000000000000000T00000000R",
-            "L0000000000000000000000000P0000000R",
-            "LBB00000000000000T0000000000000000R",
-            "L00000000000000000P000000000000000R",
-            "L0000000000000000000000000P0000000R",
-            "L00000T000000000000000000000000000R",
-            "L000000P0000000000P000000000000000R",
-            "L000000P000B000000000000D0P0000000R",
-            "L000000P000P000000000^000000000000R",
-            "L000000P000000000T000^000000000000R",
-            "L000000P0000000000P00^00T000000000R",
-            "L000000P000P000000000^000P00000000R",
-            "L000000P00000000000000000000000000R",
-            "BBBBBBBBB00000BBBBBBBBB00000BBBBBBB"]
-LAYOUT2 = ["DBBBBBBBBBBBBBBBBBBBBBBBBBBBRBBBBBBBBBBBBBBBDDBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
-           "D000000000000000000000000000R00F000000000000DD0000000000000000000RL0000000000000000000DL00000000000000000R",
-           "D0000000000000000000000000000000000000000000DD0000000000000000000000000000000000000000D000#000000000000000",
-           "D0000000000000000000000000000BBBBBBB00000000DD0000000000000000000BB0000000000000000000DL00000000000000000R",
-           "D000000000000000000000000000000^^^RL00000000DD00000000000000000000F0000000000000000000D0000000000000000000",
-           "D000000000000000000000000000000^^^0000000000DD0000000000000000000000000000000000000000DBBBBBBBBBBBBBBBBBBB",
-           "D000000000000000000000000000000^^^DD00000000DB000000000BBB0000000BB0000000000000000000D0000000000000^^^^^D",
-           "D0000BBBBBBBBBBBBBBBBBBBBBBBBBBBBBDD00000000DD000000000DDD0000000DD000E000000000000000D0000000000000^^^^^D",
-           "D000000000000000000000000000000000DD00000000DD0000000000000000000DD0000000000000000000D0000000000000^^^^^D",
-           "D000000000000000000000000000000000DD00000000DD0000000000000000000DD00000000000E0000000D0000000000000^^^^^D",
-           "D000000000000000000000000000000000DD00000000DD0000000000000000000DD0000000000000000000D0000000000000DDDDDD",
-           "D0000000B0000000000000B00000000000DD00000000DB0000000000000000000DDDDDDDDDDDDDD0000000D000000000000000000D",
-           "D000000000000000000000000000000000DD00000000DD0000000DD0000000000DD0000000000000000000D000000000000000000D",
-           "D00000000000000E000000000000000000DD00000000DD0000000BD0000000000DD0000000000000000000D000000000000000000D",
-           "D000000000000000000000000000000000DD00000000000000000000000000000DD0000000000000000000D000000000000000000D",
-           "D00000000000000000000000000000000TDD00000000000000000000000000000DD0000000000000000000D000000000000000000D",
-           "D000000000000000000000000000000000DD00000000000000000000000000000DL0000000000000000000D000000000000000000D",
-           "D000000000000000000000000000000000DD00000000000000000000000000000DD00000000000000000000000000000000000000D",
-           "D000000000000000000000000000000000DD00000000000000000000000000000DD00000000000000000000000000000000000000D",
-           "D0000000000000000000000000000E0000DD00000000000000000000000000000DD000000000000000000000000000000E0000000D",
-           "D000000F0000000000000E000000000000DD0000DDDDDBBBBBDDDDD0000000000DD00000000000000000000000000000000000000D",
-           "D000000000000000000000000000000000DD0000PPPPPPPPPPPPPPP0000000000DD000000E0000000000000000000000000000000D",
-           "D00000BBBB0000000000BBBB0000000000DD00000000000000000000000000000DD000000000000E0000000000000000000000000D",
-           "D00000P00P0000000000P00P0000000000DD0000PPPPPPPPPPPPPPP0000000000DD0000000000000000000E0000000E0000000000D",
+# Layouts, in ascending number for stages
+layout_list = []
+LAYOUT1 = ["DBBBBBBBBBBBBBBBBBBBBBBBBBBBRBBBBBBBBBBBBBBBDDBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+           "D                           R  F            DD                   RL                   DL                 R",
+           "D                                           DD                                        D   #               ",
+           "D                            BBBBBBB        DD                   BB                   DL                 R",
+           "D                              ^^^RL        DD                    F                   D                   ",
+           "D                              ^^^          DD                                        DBBBBBBBBBBBBBBBBBBB",
+           "D                              ^^^DD        DB         BBB       BB                   D             ^^^^^D",
+           "D    BBBBBBBBBBBBBBBBBBBBBBBBBBBBBDD        DD         DDD       DD   E               D             ^^^^^D",
+           "D                                 DD        DD                   DD                   D             ^^^^^D",
+           "D                                 DD        DD                   DD           E       D             ^^^^^D",
+           "D                                 DD        DD                   DD                   D             DDDDDD",
+           "D       B             B           DD        DB                   DDDDDDDDDDDDDD       D                  D",
+           "D                                 DD        DD       DD          DD                   D                  D",
+           "D              E                  DD        DD       BD          DD                   D                  D",
+           "D                                 DD                             DD                   D                  D",
+           "D                                TDD                             DD                   D                  D",
+           "D                                 DD                             DL                   D                  D",
+           "D                                 DD                             DD                                      D",
+           "D                                 DD                  #          DD                                      D",
+           "D                            E    DD                             DD                              E       D",
+           "D      F             E            DD    DDDDDBBBBBDDDDD          DD                                      D",
+           "D                                 DD    PPPPPPPPPPPPPPP          DD      E                               D",
+           "D     BBBB          BBBB          DD                             DD            E                         D",
+           "D     P  P          P  P          DD    PPPPPPPPPPPPPPP          DD                   E       E          D",
            "D000000000000000000000000000000000DD00000000000000000000000000000DD00000000000000000000000000000000000000D"]
+layout_list.append(LAYOUT1)
 
-LAYOUT = LAYOUT2
-
-LAYOUT_LENGTH = len(LAYOUT[0])
-LAYOUT_HEIGHT = len(LAYOUT)
+LAYOUT2 = ["DBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBDDBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+           "D                                                                                                        D",
+           "D                                                                                                        D",
+           "D                                                                                                        D",
+           "D                                                                                                        D",
+           "D                                                                                                        D",
+           "D                                                                                                        D",
+           "D                                                                                                        D",
+           "D                                                                                                        D",
+           "D                                                                                                        D",
+           "D                                                                                                        D",
+           "D                                                                                                        D",
+           "D                                                                                                        D",
+           "D                                                                                                        D",
+           "D         E                                                                                              D",
+           "D                                                                                                        D",
+           "D                                                                                                        D",
+           "D                                                                                                        D",
+           "D                                                                                                        D",
+           "D                                                                                                        D",
+           "D      F                                                                                                 D",
+           "D                                                                                                        D",
+           "D     BBBB                                                                                               D",
+           "D                                                                                                        D",
+           "D00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000D"]
+layout_list.append(LAYOUT2)
