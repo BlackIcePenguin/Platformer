@@ -58,22 +58,24 @@ for i in range(1, 17):
     crop = image.subsurface((24, 14, 28, 53))
     Walk_Right_List.append(crop)
 Walk_Left_List = [pygame.transform.flip(player, True, False) for player in Walk_Right_List]
-Idle_List = []
+Idle_List_Right = []
 for i in range(1, 5):
     image = pygame.image.load(f"warped city files/SPRITES/player/idle/idle-{i}.png")
     crop = image.subsurface((26, 16, 24, 51))
-    Idle_List.append(crop)
+    Idle_List_Right.append(crop)
+Idle_List_Left = [pygame.transform.flip(player, True, False) for player in Idle_List_Right]
 Run_Right_List = []
 for i in range(1, 9):
     image = pygame.image.load(f"warped city files/SPRITES/player/run/run-{i}.png")
     crop = image.subsurface((10, 16, 45, 51))
     Run_Right_List.append(crop)
 Run_Left_List = [pygame.transform.flip(player, True, False) for player in Run_Right_List]
-Air_List = []
+Air_List_Right = []
 for i in range(1, 5):
     image = pygame.image.load(f"warped city files/SPRITES/player/jump/jump-{i}.png")
     crop = image.subsurface((10, 14, 45, 53))
-    Air_List.append(crop)
+    Air_List_Right.append(crop)
+Air_List_Left = [pygame.transform.flip(player, True, False) for player in Air_List_Right]
 # Layouts, in ascending number for stages
 layout_list = []
 LAYOUT1 = ["DBBBBBBBBBBBBBBBBBBBBBBBBBBBRBBBBBBBBBBBBBBBDDBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
@@ -103,29 +105,29 @@ LAYOUT1 = ["DBBBBBBBBBBBBBBBBBBBBBBBBBBBRBBBBBBBBBBBBBBBDDBBBBBBBBBBBBBBBBBBBBBB
            "D000000000000000000000000000000000DD00000000000000000000000000000DD00000000000000000000000000000000000000D"]
 layout_list.append(LAYOUT1)
 
-LAYOUT2 = ["DBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBDDBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
-           "D                                                                                                        D",
-           "D                                                                                                        D",
-           "D                                                                                                        D",
-           "D                                                                                                        D",
-           "D                                                                                                        D",
-           "D                                                                                                        D",
-           "D                                                                                                        D",
-           "D                                                                                                        D",
-           "D                                                                                                        D",
-           "D                                                                                                        D",
-           "D                                                                                                        D",
-           "D                                                                                                        D",
-           "D                                                                                                        D",
-           "D         E                                                                                              D",
-           "D                                                                                                        D",
-           "D                                                                                                        D",
-           "D                                                                                                        D",
-           "D                                                                                                        D",
-           "D                                                                                                        D",
-           "D      F                                                                                                 D",
-           "D                                                                                                        D",
-           "D     BBBB                                                                                               D",
-           "D                                                                                                        D",
-           "D00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000D"]
+LAYOUT2 = ["DBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+           "D                            F        D              DDD              D        F                         D",
+           "D                                     D              DDD              D                                  D",
+           "DBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB       D              DDD              D       BB                         D",
+           "D  ^^                        DD       D              DDD              D       DD                         D",
+           "D  ^^                        DD       D      D       DDD       D      D       DD                         D",
+           "D             E              DD       D      D       DDD       D      D       DD                         D",
+           "D                            DB       D      B       DDD       B      D       BD                         D",
+           "D                            DD       D      D       DDD       D      D       DD                         D",
+           "D                            DD       D      D       DDD       D      D       DD                         D",
+           "D                            DD       D      D       DDD       D      D       DD                         D",
+           "D                      T     DD       D      D       DDD       D      D       DD                         D",
+           "D                            DD       D      D       BDB       D      D       DD                         D",
+           "D                            DD       B      D       DDD       D      B       DD                         D",
+           "D                            DD       D      D       DDD       D      D       DD                         D",
+           "D            E               DD       D      D       DDD       D      D       DD                         D",
+           "D                            DD       D      D       DDD       D      D       DD       DDDDDDDDDDD       D",
+           "D                            DB       B      B       DDD       B      B       BD       BBBBBBBBBBB       D",
+           "D                            DD              D       T         D              DD       ^^^^^^^^^^^       D",
+           "D                            DD              D        F        D              DD       ^^^^^^^^^^^       D",
+           "D      F           E         DD              D                 D              DD                         D",
+           "D                            DD              D                 D              DD                         D",
+           "D     BBBB                   DD              D                 D              DD                         D",
+           "D                            DD              D        E        D              DD                         D",
+           "D0000000000000000000000000000DD00000000000000D00000000000000000D00000000000000DD0000000000000000000000000D"]
 layout_list.append(LAYOUT2)

@@ -35,7 +35,8 @@ drone = pygame.image.load("warped city files/SPRITES/misc/drone/drone-1.png")
 player = Player(temp_char)
 player_group.add(player)
 
-layout_number = 0
+# Start one less than the level number, currently ascending 1->num
+layout_number = 1
 
 
 def generate_level(level):
@@ -213,8 +214,8 @@ while running:
     screen.blit(background0, (1000, 0))
     background_group.draw(screen)
     enemy_group.draw(screen)
-    # pygame.draw.rect(screen, YELLOW, player_collide, width=0)
-    # pygame.draw.rect(screen, RED, player.rect, width=0)
+    pygame.draw.rect(screen, YELLOW, player_collide, width=0)
+    pygame.draw.rect(screen, RED, player.rect, width=0)
     tile_group.draw(screen)
     lift_group.draw(screen)
     danger_group.draw(screen)
@@ -244,7 +245,7 @@ while running:
             generate_level(layout_list[layout_number])
             player.rect.x = 240
             player.rect.y = SCREEN_HEIGHT - 150
-            # player.danger = True
+
 
     # The respawning code, works when the player activates the danger state, i.e. Dies
     if player.danger:

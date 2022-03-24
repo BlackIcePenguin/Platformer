@@ -146,9 +146,14 @@ class Player(pygame.sprite.Sprite):
             self.frame += 1
         self.idle = False
         if self.falling or self.jumping:
-            if self.frame > len(Air_List) - 1:
-                self.frame = 0
-            self.image = Air_List[self.frame]
+            if self.right:
+                if self.frame > len(Air_List_Right) - 1:
+                    self.frame = 0
+                self.image = Air_List_Right[self.frame]
+            elif self.left:
+                if self.frame > len(Air_List_Left) - 1:
+                    self.frame = 0
+                self.image = Air_List_Left[self.frame]
         elif self.run:
             if self.right:
                 if self.frame > len(Run_Right_List) - 1:
@@ -168,10 +173,16 @@ class Player(pygame.sprite.Sprite):
                     self.frame = 0
                 self.image = Walk_Left_List[self.frame]
         else:
-            if self.frame > len(Idle_List) - 1:
-                self.frame = 0
-            self.image = Idle_List[self.frame]
-            self.idle = True
+            if self.right:
+                if self.frame > len(Idle_List_Right) - 1:
+                    self.frame = 0
+                self.image = Idle_List_Right[self.frame]
+                self.idle = True
+            if self.left:
+                if self.frame > len(Idle_List_Left) - 1:
+                    self.frame = 0
+                self.image = Idle_List_Left[self.frame]
+                self.idle = True
         self.walk = False
         self.run = False
 
