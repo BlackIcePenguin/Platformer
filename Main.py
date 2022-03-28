@@ -36,7 +36,7 @@ player = Player(temp_char)
 player_group.add(player)
 
 # Start one less than the level number, currently ascending 1->num
-layout_number = 1
+layout_number = 2
 
 
 def generate_level(level):
