@@ -158,39 +158,40 @@ while running:
                 player.change_x = 0
 
     # Defining the rules for the scrolling
-    if player.scroll_x:
-        if not player.idle:
+    if player.cam_unlock:
+        if player.scroll_x:
+            if not player.idle:
+                for item in all_sprites:
+                    item.change_x = -player.change_x
+                for item in enemy_group:
+                    item.rect.x += -player.change_x
+                    item.rect_init += -player.change_x
+            else:
+                pass
+        elif not player.scroll_x:
             for item in all_sprites:
-                item.change_x = -player.change_x
-            for item in enemy_group:
-                item.rect.x += -player.change_x
-                item.rect_init += -player.change_x
-        else:
-            pass
-    elif not player.scroll_x:
-        for item in all_sprites:
-            item.change_x = 0
-    if player.scroll_y:
-        for item in all_sprites:
-            item.change_y = -player.change_y
+                item.change_x = 0
+        if player.scroll_y:
+            for item in all_sprites:
+                item.change_y = -player.change_y
 
     if player.move_cam:
         if player.cam_direct == 0:
-            if player.rect.x + 2 < SCREEN_WIDTH * 0.8:
+            if player.rect.x + 5 < SCREEN_WIDTH * 0.8:
                 for item in all_sprites:
-                    item.rect.x += 2
+                    item.rect.x += 5
                 for item in enemy_group:
-                    item.rect.x += 2
-                    item.rect_init += 2
-                player.rect.x += 2
+                    item.rect.x += 5
+                    item.rect_init += 5
+                player.rect.x += 5
         if player.cam_direct == 1:
-            if player.rect.x - 2 > SCREEN_WIDTH * 0.2:
+            if player.rect.x - 5 > SCREEN_WIDTH * 0.2:
                 for item in all_sprites:
-                    item.rect.x -= 2
+                    item.rect.x -= 5
                 for item in enemy_group:
-                    item.rect.x -= 2
-                    item.rect_init -= 2
-                player.rect.x -= 2
+                    item.rect.x -= 5
+                    item.rect_init -= 5
+                player.rect.x -= 5
 
     # Sets flags as the active one and does collision for them
     for item in flag_group:

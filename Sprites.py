@@ -30,14 +30,17 @@ class Player(pygame.sprite.Sprite):
         self.scroll_y = False
         self.move_cam = False
         self.cam_direct = 2
+        self.cam_unlock = True
+        self.cam_frame_delay = 0
         self.danger = False
         self.idle = True
 
     def update(self):
         current_time = pygame.time.get_ticks()
-        if not self.scroll_x:
+        self.cam_frame_delay += 1
+        if not self.scroll_x or not self.cam_unlock:
             self.rect.x += self.change_x
-        if not self.scroll_y:
+        if not self.scroll_y or not self.cam_unlock:
             self.rect.y += self.change_y
 
         # pygame.draw.rect(self.image, WHITE, [0, 0, self.rect.width, self.rect.height])
@@ -76,14 +79,21 @@ class Player(pygame.sprite.Sprite):
             self.change_y = 10
 
         if keys[pygame.K_DOWN] or keys[pygame.K_s]:
-            pass
+            if self.cam_unlock:
+                if self.cam_frame_delay >= 60:
+                    self.cam_unlock = False
+                    self.cam_frame_delay = 0
+            elif not self.cam_unlock:
+                if self.cam_frame_delay >= 60:
+                    self.cam_unlock = True
+                    self.cam_frame_delay = 0
 
         if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
             self.change_x = 2
             self.right = True
             self.left = False
             self.walk = True
-            if self.rect.right + self.change_x >= SCREEN_WIDTH * 0.8:
+            if self.rect.right + self.change_x >= SCREEN_WIDTH * 0.55:
                 self.scroll_x = True
             else:
                 self.scroll_x = False
@@ -93,7 +103,7 @@ class Player(pygame.sprite.Sprite):
             self.right = False
             self.left = True
             self.walk = True
-            if self.rect.left + self.change_x <= SCREEN_WIDTH * 0.2:
+            if self.rect.left + self.change_x <= SCREEN_WIDTH * 0.45:
                 self.scroll_x = True
             else:
                 self.scroll_x = False
@@ -113,10 +123,10 @@ class Player(pygame.sprite.Sprite):
 
         if self.scroll_x:
             if self.left:
-                if self.rect.left + self.change_x > SCREEN_WIDTH * 0.2:
+                if self.rect.left + self.change_x > SCREEN_WIDTH * 0.6:
                     self.scroll_x = False
             elif self.right:
-                if self.rect.right + self.change_x < SCREEN_WIDTH * 0.8:
+                if self.rect.right + self.change_x < SCREEN_WIDTH * 0.4:
                     self.scroll_x = False
             if self.idle:
                 self.scroll_x = False
