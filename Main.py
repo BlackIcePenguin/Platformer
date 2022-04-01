@@ -36,7 +36,7 @@ player = Player(temp_char)
 player_group.add(player)
 
 # Start one less than the level number, currently ascending 1->num
-layout_number = 2
+layout_number = 3
 
 
 def generate_level(level):
@@ -106,6 +106,9 @@ while running:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 running = False
+            if event.key == pygame.K_r:
+                pass
+
     # Adds the extending hitbox to make sure the player can collide properly
     if player.left:
         player_collide = pygame.Rect(player.rect.x + player.change_x, player.rect.y + player.change_y,
@@ -158,7 +161,7 @@ while running:
                 player.change_x = 0
 
     # Defining the rules for the scrolling
-    if player.cam_unlock:
+    if player.cam_unlock and not player.danger:
         if player.scroll_x:
             if not player.idle:
                 for item in all_sprites:
@@ -246,7 +249,6 @@ while running:
             generate_level(layout_list[layout_number])
             player.rect.x = 240
             player.rect.y = SCREEN_HEIGHT - 150
-
 
     # The respawning code, works when the player activates the danger state, i.e. Dies
     if player.danger:
