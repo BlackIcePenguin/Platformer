@@ -36,7 +36,7 @@ player = Player(temp_char)
 player_group.add(player)
 
 # Start one less than the level number, currently ascending 1->num
-layout_number = 3
+layout_number = 0
 
 
 def generate_level(level):
@@ -174,9 +174,18 @@ while running:
         elif not player.scroll_x:
             for item in all_sprites:
                 item.change_x = 0
+            for item in enemy_group:
+                item.rect.x += 0
+                item.rect_init += 0
         if player.scroll_y:
             for item in all_sprites:
                 item.change_y = -player.change_y
+    elif not player.cam_unlock:
+        for item in all_sprites:
+            item.change_x = 0
+        for item in enemy_group:
+            item.rect.x += 0
+            item.rect_init += 0
 
     if player.move_cam:
         if player.cam_direct == 0:
@@ -218,8 +227,8 @@ while running:
     screen.blit(background0, (1000, 0))
     background_group.draw(screen)
     enemy_group.draw(screen)
-    pygame.draw.rect(screen, YELLOW, player_collide, width=0)
-    pygame.draw.rect(screen, RED, player.rect, width=0)
+    # pygame.draw.rect(screen, YELLOW, player_collide, width=0)
+    # pygame.draw.rect(screen, RED, player.rect, width=0)
     tile_group.draw(screen)
     lift_group.draw(screen)
     danger_group.draw(screen)
