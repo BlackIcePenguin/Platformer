@@ -59,9 +59,6 @@ class Player(pygame.sprite.Sprite):
         if keys[pygame.K_LCTRL]:
             self.walk = True
 
-        if keys[pygame.K_SLASH]:
-            self.change_y = -4
-
         if keys[pygame.K_UP] and not self.jumping and not self.falling:
             self.jumping = True
             self.change_y = -10

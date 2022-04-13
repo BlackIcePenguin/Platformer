@@ -7,6 +7,8 @@ pygame.display.set_caption("Platformer")
 clock = pygame.time.Clock()
 
 running = True
+start_screen = True
+end = False
 
 tile_map = SpriteSheet("warped city files/ENVIRONMENT/tileset.png")
 
@@ -40,10 +42,10 @@ layout_number = 0
 
 
 def generate_level(level):
-    for sprite in all_sprites:
-        sprite.kill()
-    for sprite in enemy_group:
-        sprite.kill()
+    for entity in all_sprites:
+        entity.kill()
+    for entity in enemy_group:
+        entity.kill()
     layout = level
     layout_length = len(layout[0])
     layout_height = len(layout)
@@ -95,7 +97,51 @@ def generate_level(level):
                 all_sprites.add(background)
 
 
+def start():
+    start1 = start_font.render(f'Welcome to my Platformer!', True, BLUE)
+    start2 = start_font.render(f'Move with either the arrow keys or A and D', True, WHITE)
+    start3 = start_font.render(f'Space, Up arrow, or W to jump', True, WHITE)
+    start4 = start_font.render(f'Hold S or down arrow for a second to toggle screen scrolling', True, WHITE)
+    start5 = start_font.render(f'Flags are your respawn points', True, WHITE)
+    start6 = start_font.render(f'By moving into walls you will cling onto them, which returns your jump', True, WHITE)
+    start7 = start_font.render(f'You can jump in the air if you have not used your jump', True, WHITE)
+    start8 = start_font.render(f'Use Q and E to manually scroll', True, WHITE)
+    start9 = start_font.render(f'There are 3 levels to beat', True, GREEN)
+    start0 = start_font.render(f'Press any key to start', True, GREEN)
+
+    screen.blit(background0, (0, 0))
+    screen.blit(background1, (503, 0))
+    screen.blit(background0, (1000, 0))
+    screen.blit(start1, [290, 50])
+    screen.blit(start2, [185, 200])
+    screen.blit(start3, [265, 250])
+    screen.blit(start4, [95, 300])
+    screen.blit(start5, [270, 450])
+    screen.blit(start6, [60, 500])
+    screen.blit(start7, [120, 550])
+    screen.blit(start8, [270, 350])
+    screen.blit(start9, [290, 710])
+    screen.blit(start0, [320, 760])
+    pygame.display.flip()
+    waiting = True
+    while waiting:
+        for z in pygame.event.get():
+            if z.type == pygame.QUIT:
+                return False
+            if z.type == pygame.KEYDOWN:
+                return True
+
+
+while start_screen:
+    if start():
+        start_screen = False
+        break
+    else:
+        running = False
+        pygame.quit()
+        break
 generate_level(layout_list[layout_number])
+
 
 while running:
 
@@ -106,10 +152,9 @@ while running:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 running = False
-            if event.key == pygame.K_r:
+            if event.key == pygame.K_p:
                 pass
-
-    # Adds the extending hitbox to make sure the player can collide properly
+    # Adds the extending hit box to make sure the player can collide properly
     if player.left:
         player_collide = pygame.Rect(player.rect.x + player.change_x, player.rect.y + player.change_y,
                                      player.rect.width - player.change_x, player.rect.height + 3)
@@ -227,6 +272,7 @@ while running:
     screen.blit(background0, (1000, 0))
     background_group.draw(screen)
     enemy_group.draw(screen)
+    # These were to test the hit box, keeping in sake of potential future debugging
     # pygame.draw.rect(screen, YELLOW, player_collide, width=0)
     # pygame.draw.rect(screen, RED, player.rect, width=0)
     tile_group.draw(screen)
@@ -255,9 +301,14 @@ while running:
     for door in door_group:
         if pygame.sprite.collide_rect(door, player):
             layout_number += 1
-            generate_level(layout_list[layout_number])
-            player.rect.x = 240
-            player.rect.y = SCREEN_HEIGHT - 150
+            if layout_number >= 3:
+                end = True
+                running = False
+                break
+            else:
+                generate_level(layout_list[layout_number])
+                player.rect.x = 240
+                player.rect.y = SCREEN_HEIGHT - 150
 
     # The respawning code, works when the player activates the danger state, i.e. Dies
     if player.danger:
@@ -297,6 +348,29 @@ while running:
     pygame.display.flip()
 
     clock.tick(FPS)
+
+if end:
+    for sprite in all_sprites:
+        sprite.kill()
+    for sprite in enemy_group:
+        sprite.kill()
+    player.kill()
+
+    end1 = start_font.render(f'Congratulations! You beat the Game', True, GREEN)
+    end2 = start_font.render(f'Press any key to quit', True, GREEN)
+    screen.blit(background0, (0, 0))
+    screen.blit(background1, (503, 0))
+    screen.blit(background0, (1000, 0))
+    screen.blit(end1, [360, 350])
+    screen.blit(end2, [445, 450])
+    pygame.display.flip()
+    waiting1 = True
+    while waiting1:
+        for m in pygame.event.get():
+            if m.type == pygame.QUIT:
+                waiting1 = False
+            if m.type == pygame.KEYDOWN:
+                waiting1 = False
 
 # Runs when main game loop ends
 pygame.quit()
