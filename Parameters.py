@@ -144,7 +144,7 @@ LAYOUT3 = ["DBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB
            "D                                     T         T   E           ET         BBBB        ^^^D              D",
            "D                    E         E       P            E           E          P  P       DDDDD            F D",
            "D      BB                                           E           E                     D   D              D",
-           "DDDDDDDDDDDDD      DDDDDDDDDDDDDDDDDDDDDDDDDBBBBDDDDDDDDDBBBDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDBBBD",
+           "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDBBBBDDDDBBDDDBBBDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDBBBD",
            "D                                                                R           F        R               ^^^D",
            "D                                                                                                     ^^^D",
            "D                                                                            L        R               ^^^D",
